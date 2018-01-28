@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.HashMap;
 
 /*
  * NOTE : =============================================================
@@ -145,6 +146,10 @@ public class AddressBook {
     private static final int PERSON_DATA_INDEX_PHONE = 1;
     private static final int PERSON_DATA_INDEX_EMAIL = 2;
 
+    private static final String PERSON_PROPERTY_NAME = "name";
+    private static final String PERSON_PROPERTY_EMAIL = "email";
+    private static final String PERSON_PROPERTY_PHONE = "phone";
+
     /**
      * The number of data elements for a single person.
      */
@@ -182,6 +187,7 @@ public class AddressBook {
      * List of all persons in the address book.
      */
     private static final ArrayList<String[]> ALL_PERSONS = new ArrayList<>();
+    private static final ArrayList<HashMap<String, String>> ALL_PERSONS_2 = new ArrayList<HashMap<String, String>>();
 
     /**
      * Stores the most recent list of persons shown to the user as a result of a user command.
