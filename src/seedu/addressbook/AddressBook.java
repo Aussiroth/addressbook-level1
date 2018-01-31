@@ -66,13 +66,13 @@ public class AddressBook {
      * at which java String.format(...) method can insert values.
      * =========================================================================
      */
-    private static final String MESSAGE_ADDED = "New person added: %1$s, Phone: %2$s, Email: %3$s";
+    private static final String MESSAGE_ADDED = "New person added: %1$s, Phone: %2$s, Email: %3$s, Address: %4$s";
     private static final String MESSAGE_ADDRESSBOOK_CLEARED = "Address book has been cleared!";
     private static final String MESSAGE_COMMAND_HELP = "%1$s: %2$s";
     private static final String MESSAGE_COMMAND_HELP_PARAMETERS = "\tParameters: %1$s";
     private static final String MESSAGE_COMMAND_HELP_EXAMPLE = "\tExample: %1$s";
     private static final String MESSAGE_DELETE_PERSON_SUCCESS = "Deleted Person: %1$s";
-    private static final String MESSAGE_DISPLAY_PERSON_DATA = "%1$s  Phone Number: %2$s  Email: %3$s";
+    private static final String MESSAGE_DISPLAY_PERSON_DATA = "%1$s  Phone Number: %2$s  Email: %3$s Address: %4$s";
     private static final String MESSAGE_DISPLAY_LIST_ELEMENT_INDEX = "%1$d. ";
     private static final String MESSAGE_GOODBYE = "Exiting Address Book... Good bye!";
     private static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format: %1$s " + LS + "%2$s";
@@ -95,10 +95,12 @@ public class AddressBook {
     // These are the prefix strings to define the data type of a command parameter
     private static final String PERSON_DATA_PREFIX_PHONE = "p/";
     private static final String PERSON_DATA_PREFIX_EMAIL = "e/";
+    private static final String PERSON_DATA_PREFIX_ADDRESS = "a/";
 
     private static final String PERSON_STRING_REPRESENTATION = "%1$s " // name
                                                             + PERSON_DATA_PREFIX_PHONE + "%2$s " // phone
-                                                            + PERSON_DATA_PREFIX_EMAIL + "%3$s"; // email
+                                                            + PERSON_DATA_PREFIX_EMAIL + "%3$s"  // email
+                                                            + PERSON_DATA_PREFIX_ADDRESS + "%4$s"; //address
     private static final String COMMAND_ADD_WORD = "add";
     private static final String COMMAND_ADD_DESC = "Adds a person to the address book.";
     private static final String COMMAND_ADD_PARAMETERS = "NAME "
@@ -152,7 +154,7 @@ public class AddressBook {
     private static final String PERSON_PROPERTY_PHONE = "phone";
 
     //enum for using HashMap<PersonProperty, String>>
-    private enum PersonProperty  {NAME, EMAIL, PHONE};
+    private enum PersonProperty  {NAME, EMAIL, PHONE, ADDRESS};
 
     /**
      * The number of data elements for a single person.
@@ -427,13 +429,13 @@ public class AddressBook {
     private static String executeAddPerson(String commandArgs) {
         // try decoding a person from the raw args
         final Optional<HashMap<PersonProperty, String>> decodeResult = decodePersonFromString(commandArgs);
-
         // checks if args are valid (decode result will not be present if the person is invalid)
         if (!decodeResult.isPresent()) {
             return getMessageForInvalidCommandInput(COMMAND_ADD_WORD, getUsageInfoForAddCommand());
         }
 
         // add the person as specified
+
         final HashMap<PersonProperty, String> personToAdd = decodeResult.get();
         addPersonToAddressBook(personToAdd);
         return getMessageForSuccessfulAddPerson(personToAdd);
@@ -448,7 +450,8 @@ public class AddressBook {
      */
     private static String getMessageForSuccessfulAddPerson(HashMap<PersonProperty, String> addedPerson) {
         return String.format(MESSAGE_ADDED,
-                getNameFromPerson(addedPerson), getPhoneFromPerson(addedPerson), getEmailFromPerson(addedPerson));
+                getNameFromPerson(addedPerson), getPhoneFromPerson(addedPerson), getEmailFromPerson(addedPerson),
+                getAddressFromPerson(addedPerson));
     }
 
     /**
@@ -633,6 +636,13 @@ public class AddressBook {
         }
     }
 
+    private  static void showToUserArray(String[] message)
+    {
+        for (String m : message) {
+            System.out.println(LINE_PREFIX + m);
+        }
+    }
+
     /**
      * Shows the list of persons to the user.
      * The list will be indexed, starting from 1.
@@ -678,7 +688,8 @@ public class AddressBook {
      */
     private static String getMessageForFormattedPersonData(HashMap<PersonProperty, String> person) {
         return String.format(MESSAGE_DISPLAY_PERSON_DATA,
-                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person));
+                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person),
+                getAddressFromPerson(person));
     }
 
     /**
@@ -870,6 +881,15 @@ public class AddressBook {
     }
 
     /**
+     * Returns given person's address
+     *
+     * @param person whose address you want
+     */
+    private static String getAddressFromPerson(HashMap<PersonProperty, String> person) {
+        return person.get(PersonProperty.ADDRESS);
+    }
+
+    /**
      * Creates a person from the given data.
      *
      * @param name of person
@@ -877,11 +897,12 @@ public class AddressBook {
      * @param email without data prefix
      * @return constructed person
      */
-    private static HashMap<PersonProperty, String> makePersonFromData(String name, String phone, String email) {
-        final HashMap<PersonProperty, String> person = new HashMap<>();
+    private static HashMap<PersonProperty, String> makePersonFromData(String name, String phone, String email, String address) {
+        HashMap<PersonProperty, String> person = new HashMap<>();
         person.put(PersonProperty.NAME, name);
         person.put(PersonProperty.PHONE, phone);
         person.put(PersonProperty.EMAIL, email);
+        person.put(PersonProperty.ADDRESS, address);
         return person;
     }
 
@@ -893,7 +914,7 @@ public class AddressBook {
      */
     private static String encodePersonToString(HashMap<PersonProperty, String> person) {
         return String.format(PERSON_STRING_REPRESENTATION,
-                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person));
+                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person), getAddressFromPerson(person));
     }
 
     /**
@@ -932,10 +953,14 @@ public class AddressBook {
         final HashMap<PersonProperty, String> decodedPerson = makePersonFromData(
                 extractNameFromPersonString(encoded),
                 extractPhoneFromPersonString(encoded),
-                extractEmailFromPersonString(encoded)
+                extractEmailFromPersonString(encoded),
+                extractAddressFromPersonString(encoded)
         );
         // check that the constructed person is valid
-        return isPersonDataValid(decodedPerson) ? Optional.of(decodedPerson) : Optional.empty();
+        if (isPersonDataValid(decodedPerson)){
+            return Optional.of(decodedPerson);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -964,12 +989,13 @@ public class AddressBook {
      * @param personData person string representation
      */
     private static boolean isPersonDataExtractableFrom(String personData) {
-        final String matchAnyPersonDataPrefix = PERSON_DATA_PREFIX_PHONE + '|' + PERSON_DATA_PREFIX_EMAIL;
+        final String matchAnyPersonDataPrefix = PERSON_DATA_PREFIX_PHONE + '|' + PERSON_DATA_PREFIX_EMAIL + '|' + PERSON_DATA_PREFIX_ADDRESS;
         final String[] splitArgs = personData.trim().split(matchAnyPersonDataPrefix);
-        return splitArgs.length == 3 // 3 arguments
+        return splitArgs.length == 4 // 4 arguments
                 && !splitArgs[0].isEmpty() // non-empty arguments
                 && !splitArgs[1].isEmpty()
-                && !splitArgs[2].isEmpty();
+                && !splitArgs[2].isEmpty()
+                && !splitArgs[3].isEmpty();
     }
 
     /**
@@ -1016,19 +1042,39 @@ public class AddressBook {
      * @return email argument WITHOUT prefix
      */
     private static String extractEmailFromPersonString(String encoded) {
-        final int indexOfPhonePrefix = encoded.indexOf(PERSON_DATA_PREFIX_PHONE);
+        final int indexOfAddressPrefix = encoded.indexOf(PERSON_DATA_PREFIX_ADDRESS);
         final int indexOfEmailPrefix = encoded.indexOf(PERSON_DATA_PREFIX_EMAIL);
 
-        // email is last arg, target is from prefix to end of string
-        if (indexOfEmailPrefix > indexOfPhonePrefix) {
-            return removePrefixSign(encoded.substring(indexOfEmailPrefix, encoded.length()).trim(),
+        // email is middle arg, target is from its prefix to start of address prefix
+        if (indexOfEmailPrefix < indexOfAddressPrefix) {
+            return removePrefixSign(encoded.substring(indexOfEmailPrefix, indexOfAddressPrefix).trim(),
                     PERSON_DATA_PREFIX_EMAIL);
 
-        // email is middle arg, target is from own prefix to next prefix
         } else {
-            return removePrefixSign(
-                    encoded.substring(indexOfEmailPrefix, indexOfPhonePrefix).trim(),
-                    PERSON_DATA_PREFIX_EMAIL);
+            System.out.println("Error, email field was not found in correct location");
+            return "Email Error";
+        }
+    }
+
+    /**
+     * Extracts substring representing address from person string representation
+     *
+     * @param encoded person string representation
+     * @return address argument WITHOUT prefix
+     */
+
+    private static String extractAddressFromPersonString(String encoded) {
+        final int indexOfEmailPrefix = encoded.indexOf(PERSON_DATA_PREFIX_EMAIL);
+        final int indexOfAddressPrefix = encoded.indexOf(PERSON_DATA_PREFIX_ADDRESS);
+
+        //address is last arg
+        if (indexOfAddressPrefix > indexOfEmailPrefix){
+            return removePrefixSign(encoded.substring(indexOfAddressPrefix, encoded.length()).trim(),
+                    PERSON_DATA_PREFIX_ADDRESS);
+        }
+        else {
+            System.out.println("Error, address was not found as last field");
+            return "Address Error";
         }
     }
 

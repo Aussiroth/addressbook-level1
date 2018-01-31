@@ -19,7 +19,8 @@ REM (valid) valid parent directory, valid filename with extension.
 copy /y NUL data\valid.filename
 java -classpath ..\bin seedu.addressbook.AddressBook "data/valid.filename" < exitinput.txt > actual.txt
 REM run the program, feed commands from input.txt file and redirect the output to the actual.txt
-java -classpath ..\bin seedu.addressbook.AddressBook < input.txt > actual.txt
+REM java -classpath ..\bin seedu.addressbook.AddressBook < input.txt > actual.txt
 
 REM compare the output to the expected output
-FC actual.txt expected.txt
+REM FC actual.txt expected.txt
+more actual.txt
