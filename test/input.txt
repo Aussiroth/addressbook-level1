@@ -28,17 +28,16 @@
   add Valid Name p/12345 e/notAnEmail
 
   # should add correctly
-  add Adam Brown p/111111 e/adam@gmail.com
+  add Adam Brown p/111111 e/adam@gmail.com a/13 Computing Drive
   list
-  add Betsy Choo p/222222 e/benchoo@nus.edu.sg
+  add Betsy Choo p/222222 e/benchoo@nus.edu.sg a/12 Fake Address
   list
 
-  # order of phone and email should not matter
-  add Charlie Dickson e/charlie.d@nus.edu.sg p/333333
+  add Charlie Dickson p/333333 e/charlie.d@nus.edu.sg a/14 Another Fake Address
   list
-  add Dickson Ee e/dickson@nus.edu.sg p/444444
+  add Dickson Ee p/444444 e/dickson@nus.edu.sg a/11 Hard Drive
   list
-  add Esther Potato p/555555 e/esther@notreal.potato
+  add Esther Potato p/555555 e/esther@notreal.potato a/10 Testing Grounds
   list
 
 ##########################################################
